@@ -18,6 +18,7 @@ steps:
     registry: https://registry.402.at
     auto_tag_suffix: linux-arm
     auto_tag: true
+    dockerfile: Dockerfile.arm
 - name: dockerhub 
   image: plugins/docker
   settings:
@@ -30,6 +31,7 @@ steps:
     auto_tag_suffix: linux-arm
     auto_tag: true
     squash: true
+    dockerfile: Dockerfile.arm
 
 ---    
 kind: pipeline
@@ -50,6 +52,7 @@ steps:
     registry: https://registry.402.at
     auto_tag_suffix: linux-arm64
     auto_tag: true
+    dockerfile: Dockerfile.arm64
 - name: dockerhub 
   image: plugins/docker
   settings:
@@ -62,6 +65,7 @@ steps:
     auto_tag_suffix: linux-arm64
     auto_tag: true
     squash: true
+    dockerfile: Dockerfile.arm64
 ---    
 kind: pipeline
 type: docker

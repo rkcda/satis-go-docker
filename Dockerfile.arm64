@@ -1,0 +1,74 @@
+FROM golang:1.12 as builder
+RUN go get -d -v github.com/benschw/satis-go
+WORKDIR /go/src/github.com/benschw/satis-go/
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o satis-go .
+
+
+FROM node as builder1
+RUN mkdir -p /opt/satis-go/admin-ui && \
+    wget -qO- https://github.com/benschw/satis-admin/archive/master.tar.gz | \
+        tar xzv --strip-components=1 -C /opt/satis-go/admin-ui
+WORKDIR /opt/satis-go/admin-ui
+RUN npm i bower && \
+    node_modules/.bin/bower i --allow-root
+
+
+FROM composer/satis
+
+ENV SATIS_GO_BIND 0.0.0.0:8080
+ENV SATIS_GO_DB_PATH /opt/satis-go/data
+ENV SATIS_GO_REPOUI_PATH /usr/share/nginx/htlm
+ENV SATIS_GO_REPO_NAME "My Satis"
+ENV SATIS_GO_REPO_HOST http://localhost:8080
+ENV PATH="/satis/bin:${PATH}"
+ENV LANG=C.UTF-8
+ENV TINI_VERSION v0.18.0
+
+# based on https://github.com/frol/docker-alpine-glibc/blob/master/Dockerfile
+# also added envsubst based on https://github.com/cirocosta/alpine-envsubst/blob/master/Dockerfile
+# using https://github.com/woahbase/alpine-glibc/blob/master/Dockerfile_aarch64 for arm64 build
+RUN set -xe \
+    && apk add --no-cache --purge -uU curl \
+    && mkdir -p /glibc \
+    && GLIBC_VERSION="$(curl -SL https://api.github.com/repos/SatoshiPortal/alpine-pkg-glibc/releases/latest | awk '/tag_name/{print $4;exit}' FS='[""]' | sed -e 's_v__')" \
+    && echo "Using GLIBC Version: ${GLIBC_VERSION}" \
+    && GLIBC_KEY="https://github.com/SatoshiPortal/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/cyphernode@satoshiportal.com.rsa.pub" \
+    && GLIBC_URL='https://github.com/SatoshiPortal/alpine-pkg-glibc/releases/download' \
+    && curl \
+        -jkSL ${GLIBC_KEY} \
+        -o /etc/apk/keys/cyphernode@satoshiportal.com.rsa.pub \
+    && curl \
+        -jkSL ${GLIBC_URL}/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}-aarch64.apk \
+        -o /glibc/glibc-${GLIBC_VERSION}.apk \
+    && curl \
+        -jkSL ${GLIBC_URL}/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}-aarch64.apk \
+        -o /glibc/glibc-bin-${GLIBC_VERSION}.apk \
+    && curl \
+        -jkSL ${GLIBC_URL}/${GLIBC_VERSION}/glibc-i18n-${GLIBC_VERSION}-aarch64.apk \
+        -o /glibc/glibc-i18n-${GLIBC_VERSION}.apk \
+    && apk add --update --no-cache /glibc/*.apk; \
+    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true \
+    && echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh \
+    && /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib \
+    && echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf \
+    && apk del --purge curl glibc-i18n \
+    && rm -rf /var/cache/apk/* /tmp/* /glibc /etc/apk/keys/cyphernode@satoshiportal.com.rsa.pub
+
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+# install satis-go
+RUN mkdir -p /opt/satis-go /opt/satis-go/admin-ui
+COPY --from=builder /go/src/github.com/benschw/satis-go/satis-go /opt/satis-go/
+RUN chmod +x /opt/satis-go/satis-go && \
+    wget -qO- https://github.com/benschw/satis-admin/releases/download/0.1.1/admin-ui.tar.gz | \
+        tar xzv --strip-components=1 -C /opt/satis-go/admin-ui
+COPY --from=builder1 /opt/satis-go/admin-ui/bower_components /opt/satis-go/admin-ui/bower_components
+
+ADD entrypoint.sh /entrypoint.sh
+ADD config.template.yaml /opt/satis-go/config.template.yaml
+
+EXPOSE 8080
+
+ENTRYPOINT ["/tini", "-g", "--", "/entrypoint.sh"]
+
+CMD ["/opt/satis-go/satis-go"]
