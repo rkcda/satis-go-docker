@@ -13,7 +13,7 @@ RUN npm i bower && \
     node_modules/.bin/bower i --allow-root
 
 
-FROM composer/satis
+FROM nedaya/satis
 
 ENV SATIS_GO_BIND 0.0.0.0:8080
 ENV SATIS_GO_DB_PATH /opt/satis-go/data
