@@ -1,6 +1,6 @@
-bind: ${SATIS_GO_BIND}
-dbpath: ${SATIS_GO_DB_PATH}
-repouipath: ${SATIS_GO_REPOUI_PATH}
+bind: 0.0.0.0:8080
+dbpath: /opt/satis-go/data
+repouipath: /usr/share/nginx/html
 adminuipath: /opt/satis-go/admin-ui
-reponame: ${SATIS_GO_REPO_NAME}
-repohost: ${SATIS_GO_REPO_HOST}
+reponame: "My Satis"
+repohost: http://localhost:8080
