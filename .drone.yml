@@ -7,18 +7,6 @@ platform:
   arch: arm 
 
 steps:
-- name: docker internal 
-  image: plugins/docker
-  settings:
-    username:
-      from_secret: docker_username
-    password:
-      from_secret: docker_password
-    repo: registry.402.at/satis-go-docker
-    registry: https://registry.402.at
-    auto_tag_suffix: linux-arm
-    auto_tag: true
-    dockerfile: Dockerfile.arm
 - name: dockerhub 
   image: plugins/docker
   settings:
@@ -26,7 +14,7 @@ steps:
       from_secret: dockerhub_username
     password:
       from_secret: dockerhub_password
-    repo: registry.hub.docker.com/nedaya/satis-go-docker
+    repo: registry.hub.docker.com/nedaya/satis-go
     registry: registry.hub.docker.com
     auto_tag_suffix: linux-arm
     auto_tag: true
@@ -41,18 +29,6 @@ name: linux-arm64
 platform:
     arch: arm64 
 steps:      
-- name: docker internal 
-  image: plugins/docker
-  settings:
-    username:
-      from_secret: docker_username
-    password:
-      from_secret: docker_password
-    repo: registry.402.at/satis-go-docker
-    registry: https://registry.402.at
-    auto_tag_suffix: linux-arm64
-    auto_tag: true
-    dockerfile: Dockerfile.arm64
 - name: dockerhub 
   image: plugins/docker
   settings:
@@ -60,7 +36,7 @@ steps:
       from_secret: dockerhub_username
     password:
       from_secret: dockerhub_password
-    repo: registry.hub.docker.com/nedaya/satis-go-docker
+    repo: registry.hub.docker.com/nedaya/satis-go
     registry: registry.hub.docker.com
     auto_tag_suffix: linux-arm64
     auto_tag: true
@@ -74,17 +50,6 @@ name: linux-amd64
 platform:
     arch: amd64 
 steps:      
-- name: docker internal 
-  image: plugins/docker
-  settings:
-    username:
-      from_secret: docker_username
-    password:
-      from_secret: docker_password
-    repo: registry.402.at/satis-go-docker
-    registry: https://registry.402.at
-    auto_tag_suffix: linux-amd64
-    auto_tag: true
 - name: dockerhub 
   image: plugins/docker
   settings:
@@ -92,7 +57,7 @@ steps:
       from_secret: dockerhub_username
     password:
       from_secret: dockerhub_password
-    repo: registry.hub.docker.com/nedaya/satis-go-docker
+    repo: registry.hub.docker.com/nedaya/satis-go
     registry: registry.hub.docker.com
     auto_tag_suffix: linux-amd64
     auto_tag: true
@@ -118,7 +83,19 @@ steps:
       from_secret: dockerhub_username
     password:
       from_secret: dockerhub_password
-
+- name: readme
+  image: nedaya/dockerhub-description:2
+  environment:
+    DOCKERHUB_USERNAME:
+      from_secret: dockerhub_username
+    DOCKERHUB_PASSWORD:
+      from_secret: dockerhub_password
+    DOCKERHUB_REPOSITORY: nedaya/satis-go    
+    README_FILEPATH: README.md
+    SHORT_DESCRIPTION: "A cross platform build of composer/satis-go"
+  commands:
+    - node /index.js 
+    
 trigger:
   event:
   - push
