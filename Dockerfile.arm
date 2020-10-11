@@ -54,7 +54,7 @@ RUN set -xe \
     && apk del --purge curl glibc-i18n \
     && rm -rf /var/cache/apk/* /tmp/* /glibc /etc/apk/keys/cyphernode@satoshiportal.com.rsa.pub
 
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-armhf /tini
 RUN chmod +x /tini
 # install satis-go
 RUN mkdir -p /opt/satis-go /opt/satis-go/admin-ui
