@@ -77,7 +77,7 @@ RUN chmod +x /opt/satis-go/satis-go && \
 COPY --from=builder1 /opt/satis-go/admin-ui/bower_components /opt/satis-go/admin-ui/bower_components
 
 ADD entrypoint.sh /entrypoint.sh
-ADD config.template.yaml /opt/satis-go/config.yaml
+ADD config.template.yaml /opt/satis-go/config.template.yaml
 
 EXPOSE 8080
 
