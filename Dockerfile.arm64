@@ -57,9 +57,9 @@ RUN set -xe \
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-arm64 /tini
 RUN chmod +x /tini
 
- RUN apk add gettext libintl \
-    && mv /usr/bin/envsubst /usr/local/sbin/envsubst 
-    
+ RUN apk add gettext libintl 
+    #&& mv /usr/bin/envsubst /usr/local/sbin/envsubst 
+
 # install satis-go
 RUN mkdir -p /opt/satis-go /opt/satis-go/admin-ui
 COPY --from=builder /go/src/github.com/benschw/satis-go/satis-go /opt/satis-go/

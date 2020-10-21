@@ -66,8 +66,8 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
         "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
- RUN apk add gettext libintl \
-    && mv /usr/bin/envsubst /usr/local/sbin/envsubst 
+ RUN apk add gettext libintl 
+    #&& mv /usr/bin/envsubst /usr/local/sbin/envsubst 
 
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
