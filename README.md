@@ -20,13 +20,9 @@ services:
       - <network>
 volumes:
   composer_data:
-    driver: local
-    driver_opts:
-      type: nfs4
-      o: addr=192.168.0.5,rw,nolock
-      device: ":/home/pi/storage/DockerVolumes/402/composer"
+    ...
   satis_go_data:
-...
+    ...
 networks:
-...
+  ...
 ```
