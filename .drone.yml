@@ -42,26 +42,26 @@ steps:
     auto_tag: true
     squash: true
     dockerfile: Dockerfile.arm64
----    
-kind: pipeline
-type: docker
-name: linux-amd64
+# ---    
+# kind: pipeline
+# type: docker
+# name: linux-amd64
 
-platform:
-    arch: amd64 
-steps:      
-- name: dockerhub 
-  image: plugins/docker
-  settings:
-    username:
-      from_secret: dockerhub_username
-    password:
-      from_secret: dockerhub_password
-    repo: registry.hub.docker.com/nedaya/satis-go
-    registry: registry.hub.docker.com
-    auto_tag_suffix: linux-amd64
-    auto_tag: true
-    squash: true
+# platform:
+#     arch: amd64 
+# steps:      
+# - name: dockerhub 
+#   image: plugins/docker
+#   settings:
+#     username:
+#       from_secret: dockerhub_username
+#     password:
+#       from_secret: dockerhub_password
+#     repo: registry.hub.docker.com/nedaya/satis-go
+#     registry: registry.hub.docker.com
+#     auto_tag_suffix: linux-amd64
+#     auto_tag: true
+#     squash: true
     
     
 ---
@@ -102,6 +102,6 @@ trigger:
   - tag
 
 depends_on:
-- linux-amd64
+#- linux-amd64
 - linux-arm64
 - linux-arm
